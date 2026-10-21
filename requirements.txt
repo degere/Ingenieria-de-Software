@@ -1,0 +1,5 @@
+#este archivo es para cuando clonen el repositorio, hacen " pip install -r requirements.txt " y van a instalar ambas cosas
+
+django
+psycopg[binary]
+#psycopg es un adaptador que se usa para que django se conecte con postgresql
