@@ -2,7 +2,18 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
 from .forms import UserChangeForm, UserCreationForm
-from .models import User
+from .models import (
+    Asiento,
+    Compra,
+    DetalleConfiteria,
+    Entrada,
+    Funcion,
+    Pelicula,
+    ProductoConfiteria,
+    Sala,
+    User,
+    Usuario,
+)
 
 
 @admin.register(User)
@@ -39,3 +50,8 @@ class UserAdmin(DjangoUserAdmin):
         ),
     )
     filter_horizontal = ("groups", "user_permissions")
+
+
+admin.site.register(
+    (Sala, Asiento, Pelicula, Funcion, ProductoConfiteria, Usuario, Compra, Entrada, DetalleConfiteria)
+)

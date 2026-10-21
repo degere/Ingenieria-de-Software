@@ -22,11 +22,15 @@ Las solicitudes que envían datos deben usar `Content-Type: application/json`. L
 | --- | --- | --- | --- |
 | `GET` | `/` | Público | Muestra el estado del backend y el índice de rutas. |
 | `GET` | `/api/auth/csrf/` | Público | Obtiene un token CSRF y configura su cookie. |
-| `POST` | `/api/auth/register/` | Público | Registra una cuenta. Recibe `email`, `password`, `password_confirmation` y opcionalmente `first_name`, `last_name`. |
+| `POST` | `/api/auth/register/` | Público | Registra una cuenta. Recibe `email`, `password`, `password_confirmation` y un nombre mediante `nombre_completo` o `first_name`/`last_name`. |
 | `POST` | `/api/auth/login/` | Público | Inicia sesión. Recibe `email` y `password`. |
 | `POST` | `/api/auth/logout/` | Público | Cierra la sesión actual. |
 | `GET` | `/api/users/me/` | Sesión iniciada | Devuelve el perfil actual. |
-| `PATCH` | `/api/users/me/` | Sesión iniciada | Modifica `email`, `first_name` y/o `last_name`. |
+| `PATCH` | `/api/users/me/` | Sesión iniciada | Modifica `email` y el nombre mediante `nombre_completo` o `first_name`/`last_name`. |
 | `POST` | `/api/users/me/password/` | Sesión iniciada | Cambia la contraseña con `current_password`, `new_password` y `password_confirmation`. |
 
 El correo se valida y debe ser único. Django almacena las contraseñas mediante su sistema de hash y aplica los validadores configurados en `settings.py`.
+
+## Modelos de cine
+
+`cine_nido.models` incluye `Sala`, `Asiento`, `Pelicula`, `Funcion`, `ProductoConfiteria`, `Usuario`, `Compra`, `Entrada` y `DetalleConfiteria`. `Usuario` enlaza el perfil de compra con la cuenta de autenticación de Django; la contraseña se guarda únicamente en esa cuenta con hash.

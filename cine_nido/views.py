@@ -10,6 +10,8 @@ from django.middleware.csrf import get_token
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
+from .models import Usuario
+
 
 User = get_user_model()
 EMAIL_VALIDATOR = EmailValidator()
@@ -50,12 +52,32 @@ def _read_json(request):
     return data, None
 
 
+def _full_name(user):
+    return " ".join(part for part in (user.first_name.strip(), user.last_name.strip()) if part)
+
+
+def _profile_for(user):
+    profile, _ = Usuario.objects.get_or_create(
+        user=user,
+        defaults={
+            "nombre_completo": _full_name(user) or user.email,
+            "email": user.email,
+        },
+    )
+    if profile.email != user.email:
+        profile.email = user.email
+        profile.save(update_fields=["email"])
+    return profile
+
+
 def _user_json(user):
+    profile = _profile_for(user)
     return {
         "id": user.pk,
         "email": user.email,
         "first_name": user.first_name,
         "last_name": user.last_name,
+        "nombre_completo": profile.nombre_completo,
         "date_joined": user.date_joined.isoformat(),
     }
 
@@ -64,6 +86,8 @@ def _email_value(value):
     if not isinstance(value, str) or not value.strip():
         raise ValidationError("Ingresa un correo electrónico.")
     email = value.strip().lower()
+    if len(email) > User._meta.get_field("email").max_length:
+        raise ValidationError("El correo admite hasta 100 caracteres.")
     EMAIL_VALIDATOR(email)
     return email
 
@@ -76,6 +100,17 @@ def _name_value(field, value):
     if len(value) > max_length:
         raise ValidationError(f"Este campo admite hasta {max_length} caracteres.")
     return value
+
+
+def _profile_name_value(value):
+    if not isinstance(value, str):
+        raise ValidationError("El nombre completo debe ser texto.")
+    name = " ".join(value.split())
+    if not name:
+        raise ValidationError("El nombre completo es obligatorio.")
+    if len(name) > Usuario._meta.get_field("nombre_completo").max_length:
+        raise ValidationError("El nombre completo admite hasta 100 caracteres.")
+    return name
 
 
 def _password_errors(password, user=None):
@@ -115,7 +150,14 @@ def register(request):
     if error_response:
         return error_response
 
-    allowed_fields = {"email", "password", "password_confirmation", "first_name", "last_name"}
+    allowed_fields = {
+        "email",
+        "password",
+        "password_confirmation",
+        "first_name",
+        "last_name",
+        "nombre_completo",
+    }
     unknown_fields = sorted(set(data) - allowed_fields)
     if unknown_fields:
         return JsonResponse(
@@ -141,11 +183,24 @@ def register(request):
             status=400,
         )
 
+    if "nombre_completo" in data and ({"first_name", "last_name"} & set(data)):
+        return JsonResponse(
+            {"error": "Envía nombre_completo o first_name/last_name, pero no ambos."},
+            status=400,
+        )
+
     try:
-        first_name = _name_value("first_name", data.get("first_name", ""))
-        last_name = _name_value("last_name", data.get("last_name", ""))
+        if "nombre_completo" in data:
+            full_name = _profile_name_value(data["nombre_completo"])
+            name_parts = full_name.split(maxsplit=1)
+            first_name = _name_value("first_name", name_parts[0])
+            last_name = _name_value("last_name", name_parts[1] if len(name_parts) > 1 else "")
+        else:
+            first_name = _name_value("first_name", data.get("first_name", ""))
+            last_name = _name_value("last_name", data.get("last_name", ""))
+            full_name = _profile_name_value(" ".join((first_name, last_name)))
     except ValidationError as error:
-        return _validation_response(error)
+        return _validation_response(error, "nombre_completo")
 
     if User.objects.filter(email__iexact=email).exists():
         return JsonResponse({"error": "Ya existe una cuenta con ese correo."}, status=409)
@@ -157,6 +212,11 @@ def register(request):
                 password=password,
                 first_name=first_name,
                 last_name=last_name,
+            )
+            Usuario.objects.create(
+                user=user,
+                nombre_completo=full_name,
+                email=email,
             )
     except IntegrityError:
         return JsonResponse({"error": "Ya existe una cuenta con ese correo."}, status=409)
@@ -207,7 +267,7 @@ def current_user(request):
     if not data:
         return JsonResponse({"error": "Envía al menos un campo para modificar."}, status=400)
 
-    editable_fields = {"email", "first_name", "last_name"}
+    editable_fields = {"email", "first_name", "last_name", "nombre_completo"}
     unknown_fields = sorted(set(data) - editable_fields)
     if unknown_fields:
         return JsonResponse(
@@ -215,7 +275,14 @@ def current_user(request):
             status=400,
         )
 
+    if "nombre_completo" in data and ({"first_name", "last_name"} & set(data)):
+        return JsonResponse(
+            {"error": "Envía nombre_completo o first_name/last_name, pero no ambos."},
+            status=400,
+        )
+
     user = request.user
+    changed_fields = []
     if "email" in data:
         try:
             email = _email_value(data["email"])
@@ -224,17 +291,40 @@ def current_user(request):
         if User.objects.filter(email__iexact=email).exclude(pk=user.pk).exists():
             return JsonResponse({"error": "Ya existe una cuenta con ese correo."}, status=409)
         user.email = email
+        changed_fields.append("email")
 
     try:
-        for field in ("first_name", "last_name"):
-            if field in data:
-                setattr(user, field, _name_value(field, data[field]))
+        if "nombre_completo" in data:
+            full_name = _profile_name_value(data["nombre_completo"])
+            name_parts = full_name.split(maxsplit=1)
+            user.first_name = name_parts[0]
+            user.last_name = name_parts[1] if len(name_parts) > 1 else ""
+            changed_fields.extend(("first_name", "last_name"))
+        elif {"first_name", "last_name"} & set(data):
+            for field in ("first_name", "last_name"):
+                if field in data:
+                    setattr(user, field, _name_value(field, data[field]))
+                    changed_fields.append(field)
+            full_name = _profile_name_value(_full_name(user))
+        else:
+            try:
+                full_name = user.perfil.nombre_completo
+            except Usuario.DoesNotExist:
+                full_name = _profile_name_value(_full_name(user) or user.email)
     except ValidationError as error:
-        return _validation_response(error)
+        return _validation_response(error, "nombre_completo")
 
     try:
-        changed_fields = [field for field in ("email", "first_name", "last_name") if field in data]
-        user.save(update_fields=changed_fields)
+        with transaction.atomic():
+            if changed_fields:
+                user.save(update_fields=changed_fields)
+            profile, _ = Usuario.objects.get_or_create(
+                user=user,
+                defaults={"nombre_completo": full_name, "email": user.email},
+            )
+            profile.nombre_completo = full_name
+            profile.email = user.email
+            profile.save(update_fields=["nombre_completo", "email"])
     except IntegrityError:
         return JsonResponse({"error": "Ya existe una cuenta con ese correo."}, status=409)
 
