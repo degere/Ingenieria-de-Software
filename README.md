@@ -13,6 +13,7 @@ python manage.py runserver
 ```
 
 La configuración local usa SQLite. Para entrar al panel `/admin/`, crea un administrador con `python manage.py createsuperuser`.
+En VS Code, selecciona el entorno `.venv` con `Python: Select Interpreter` para que el editor encuentre Django y las dependencias del proyecto.
 
 ## API de usuarios
 
