@@ -20,6 +20,7 @@ from django.urls import path
 from cine_nido import views
 
 urlpatterns = [
+    path('', views.api_root, name='api-root'),
     path('admin/', admin.site.urls),
     path('api/auth/csrf/', views.csrf_token, name='csrf-token'),
     path('api/auth/register/', views.register, name='register'),

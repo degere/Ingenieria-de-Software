@@ -15,6 +15,25 @@ User = get_user_model()
 EMAIL_VALIDATOR = EmailValidator()
 
 
+@require_GET
+def api_root(request):
+    return JsonResponse(
+        {
+            "service": "Sistema de Venta de Entradas de Cine Nido",
+            "status": "ok",
+            "endpoints": {
+                "csrf": "/api/auth/csrf/",
+                "register": "/api/auth/register/",
+                "login": "/api/auth/login/",
+                "logout": "/api/auth/logout/",
+                "current_user": "/api/users/me/",
+                "change_password": "/api/users/me/password/",
+                "admin": "/admin/",
+            },
+        }
+    )
+
+
 def _read_json(request):
     if request.content_type != "application/json":
         return None, JsonResponse(

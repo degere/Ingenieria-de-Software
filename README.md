@@ -20,6 +20,7 @@ Las solicitudes que envían datos deben usar `Content-Type: application/json`. L
 
 | Método | Ruta | Acceso | Descripción |
 | --- | --- | --- | --- |
+| `GET` | `/` | Público | Muestra el estado del backend y el índice de rutas. |
 | `GET` | `/api/auth/csrf/` | Público | Obtiene un token CSRF y configura su cookie. |
 | `POST` | `/api/auth/register/` | Público | Registra una cuenta. Recibe `email`, `password`, `password_confirmation` y opcionalmente `first_name`, `last_name`. |
 | `POST` | `/api/auth/login/` | Público | Inicia sesión. Recibe `email` y `password`. |
