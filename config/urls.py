@@ -17,6 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from cine_nido import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/auth/csrf/', views.csrf_token, name='csrf-token'),
+    path('api/auth/register/', views.register, name='register'),
+    path('api/auth/login/', views.sign_in, name='login'),
+    path('api/auth/logout/', views.sign_out, name='logout'),
+    path('api/users/me/', views.current_user, name='current-user'),
+    path('api/users/me/password/', views.change_password, name='change-password'),
 ]
