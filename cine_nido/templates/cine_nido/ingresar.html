@@ -1,0 +1,18 @@
+{% extends "cine_nido/base.html" %}
+{% block titulo %}Ingresar{% endblock %}
+{% block contenido %}
+<div class="contenedor">
+  <section class="tarjeta auth">
+    <h1>Ingresar</h1>
+    <p class="suave">Accede con tu correo y contraseña.</p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="campo"><label for="correo">Correo</label><input id="correo" type="email" name="correo" required autocomplete="email"></div>
+      <div class="campo"><label for="clave">Contraseña</label><input id="clave" type="password" name="clave" required autocomplete="current-password"></div>
+      <p><a href="{% url 'recuperar' %}">¿Olvidaste tu contraseña?</a></p>
+      <button class="btn btn-primario btn-bloque" type="submit">Ingresar</button>
+    </form>
+    <p class="centrado suave" style="margin-top:1rem">¿No tienes cuenta? <a href="{% url 'registro' %}">Regístrate</a></p>
+  </section>
+</div>
+{% endblock %}

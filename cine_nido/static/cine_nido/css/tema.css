@@ -1,0 +1,88 @@
+/* ==========================================================================
+   TEMA - CINE NIDO
+   --------------------------------------------------------------------------
+   ESTE ES EL ÚNICO ARCHIVO QUE HAY QUE TOCAR PARA CAMBIAR LOS COLORES.
+   Todo el sitio (estilos.css) usa estas variables, así que al cambiar un
+   valor aquí cambia en todas las pantallas.
+   Los colores actuales son TEMPORALES hasta definir los corporativos (R43).
+   ========================================================================== */
+
+:root {
+  /* --- Marca ------------------------------------------------------------ */
+  --color-primario: #f5b301;          /* botones principales, acentos */
+  --color-primario-hover: #ffc933;
+  --color-sobre-primario: #1a1405;    /* texto encima del color primario */
+  --color-secundario: #c0392b;        /* acentos secundarios, alertas de marca */
+  --color-secundario-hover: #d9473a;
+  --color-sobre-secundario: #ffffff;
+
+  /* --- Fondos y bordes --------------------------------------------------- */
+  --color-fondo: #12121a;             /* fondo general de la página */
+  --color-superficie: #1c1c28;        /* tarjetas, cabecera, paneles */
+  --color-superficie-2: #26263a;      /* inputs, filas alternas, hover */
+  --color-borde: #34344d;
+
+  /* --- Texto ------------------------------------------------------------- */
+  --color-texto: #f2f2f7;
+  --color-texto-suave: #a9a9bd;
+  --color-enlace: #f5b301;
+
+  /* --- Estados (mensajes, etiquetas) -------------------------------------- */
+  --color-ok: #2ecc71;
+  --color-error: #e74c3c;
+  --color-aviso: #f39c12;
+  --color-info: #3498db;
+
+  /* --- Mapa de asientos (R21) --------------------------------------------- */
+  --asiento-disponible: #3a3a55;
+  --asiento-seleccionado: #f5b301;
+  --asiento-ocupado: #7a2b2b;
+  --asiento-reservado: #8a6d1d;
+  --asiento-movilidad: #2f6f9f;
+
+  /* --- Forma y tipografía (también editables) ------------------------------ */
+  --radio: 12px;
+  --radio-chico: 8px;
+  --sombra: 0 6px 20px rgba(0, 0, 0, 0.35);
+  --fuente: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ==========================================================================
+   PRESETS ALTERNATIVOS (descomentar el bloque completo para probarlos).
+   Basta con pegar los valores de arriba que quieran reemplazar.
+   ========================================================================== */
+
+/* Preset B: claro con rojo cortina
+:root {
+  --color-primario: #b3262d;
+  --color-primario-hover: #cf3a41;
+  --color-sobre-primario: #ffffff;
+  --color-secundario: #1f2a44;
+  --color-secundario-hover: #2f3d60;
+  --color-fondo: #f6f4f0;
+  --color-superficie: #ffffff;
+  --color-superficie-2: #efece6;
+  --color-borde: #ddd8cf;
+  --color-texto: #1d1d22;
+  --color-texto-suave: #666672;
+  --color-enlace: #b3262d;
+  --asiento-disponible: #cfd3dc;
+  --asiento-ocupado: #d9a3a6;
+  --asiento-reservado: #e6cf8f;
+}
+*/
+
+/* Preset C: azul noche y turquesa
+:root {
+  --color-primario: #2dd4bf;
+  --color-primario-hover: #5eead4;
+  --color-sobre-primario: #04201c;
+  --color-secundario: #6366f1;
+  --color-fondo: #0b1220;
+  --color-superficie: #121b2e;
+  --color-superficie-2: #1b2740;
+  --color-borde: #2a3956;
+  --color-enlace: #2dd4bf;
+  --asiento-seleccionado: #2dd4bf;
+}
+*/

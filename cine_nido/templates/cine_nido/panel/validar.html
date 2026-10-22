@@ -1,0 +1,22 @@
+{% extends "cine_nido/panel/base_panel.html" %}
+{% block titulo %}Panel · Validar QR{% endblock %}
+{% block panel_contenido %}
+<div class="panel-encabezado"><h1>Validar entradas y retiros</h1></div>
+<div class="paneles-2">
+  <div class="tarjeta">
+    {# DEMO: la lectura por cámara o lector estándar se implementará después (R34, R35, R53). #}
+    <div class="visor-qr">📷<br>Cámara / lector de QR</div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="campo"><label for="codigo">O escribe el código manualmente</label><input id="codigo" name="codigo" placeholder="CN-000123-D5"></div>
+      <button class="btn btn-primario btn-bloque" type="submit">Validar</button>
+    </form>
+  </div>
+  <div>
+    <h2 style="font-size:1.1rem">Posibles resultados</h2>
+    <div class="resultado"><strong>Entrada válida</strong><br><span class="suave">Noche en el Muelle · Sala 1 · 20:30 · Asiento D5</span></div>
+    <div class="resultado aviso"><strong>Entrada ya utilizada</strong><br><span class="suave">Escaneada hoy a las 20:12</span></div>
+    <div class="resultado error"><strong>Entrada no válida</strong><br><span class="suave">No corresponde a esta función</span></div>
+  </div>
+</div>
+{% endblock %}

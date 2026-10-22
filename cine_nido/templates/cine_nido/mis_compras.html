@@ -1,0 +1,22 @@
+{% extends "cine_nido/base.html" %}
+{% block titulo %}Mis compras{% endblock %}
+{% block contenido %}
+<div class="contenedor seccion">
+  <h1 class="titulo-seccion">Mis compras</h1>
+  <div class="tabla-contenedor">
+    <table>
+      <thead><tr><th>N° venta</th><th>Fecha</th><th>Película</th><th>Canal</th><th>Total</th><th>Estado</th><th></th></tr></thead>
+      <tbody>
+        {% for c in compras %}
+        <tr>
+          <td>{{ c.numero }}</td><td>{{ c.fecha|date:"d/m/Y" }}</td><td>{{ c.pelicula }}</td><td>{{ c.canal }}</td>
+          <td>${{ c.total|floatformat:"0g" }}</td>
+          <td><span class="badge badge-{{ c.estado.badge }}">{{ c.estado.texto }}</span></td>
+          <td><a class="btn btn-borde btn-chico" href="{% url 'entrada' c.id %}">Ver entradas</a></td>
+        </tr>
+        {% empty %}<tr><td colspan="7" class="vacio">Aún no tienes compras.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "cine_nido/base.html" %}
+{% block titulo %}{{ pelicula.nombre }}{% endblock %}
+{% block contenido %}
+<div class="contenedor">
+  <article class="detalle">
+    <div class="afiche">
+      {% if pelicula.portada %}<img src="{{ pelicula.portada }}" alt="Afiche de {{ pelicula.nombre }}">
+      {% else %}<div class="afiche-vacio"><span>{{ pelicula.nombre }}</span></div>{% endif %}
+    </div>
+    <div>
+      <h1>{{ pelicula.nombre }}</h1>
+      <div class="etiquetas">
+        <span class="badge badge-aviso">{{ pelicula.clasificacion }}</span>
+        <span class="badge">{{ pelicula.formato }}</span>
+        <span class="badge">{{ pelicula.idioma }}</span>
+        <span class="badge">{{ pelicula.genero }}</span>
+      </div>
+      <p>{{ pelicula.sinopsis }}</p>
+      <dl class="ficha">
+        <dt>Duración</dt><dd>{{ pelicula.duracion }} minutos</dd>
+        <dt>Director</dt><dd>{{ pelicula.director }}</dd>
+        <dt>Estreno</dt><dd>{{ pelicula.fecha_estreno|date:"j \d\e F \d\e Y" }}</dd>
+      </dl>
+      <a class="btn btn-borde" href="{{ pelicula.trailer }}">▶ Ver tráiler</a>
+    </div>
+  </article>
+
+  <section class="seccion" style="padding-top:0">
+    <h2 class="titulo-seccion">Horarios</h2>
+    {% for dia in dias %}
+      <div class="dia-horarios">
+        <h3>{{ dia.fecha|date:"l j \d\e F" }}</h3>
+        <div class="chips">
+          {% for f in dia.funciones %}
+          <a class="chip-horario" href="{% url 'asientos' f.id %}">
+            <strong>{{ f.hora }}</strong>
+            <small>{{ f.sala }} · {{ f.formato }} · {{ f.idioma }}</small>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% empty %}
+      <p class="vacio">Los horarios estarán disponibles próximamente.</p>
+    {% endfor %}
+  </section>
+</div>
+{% endblock %}

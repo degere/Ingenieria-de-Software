@@ -1,0 +1,8 @@
+{# Uso: {% include "cine_nido/_pasos.html" with paso=2 %} #}
+<ol class="pasos" aria-label="Pasos de la compra">
+  <li class="{% if paso > 1 %}hecho{% elif paso == 1 %}actual{% endif %}"><span>1</span>Función</li>
+  <li class="{% if paso > 2 %}hecho{% elif paso == 2 %}actual{% endif %}"><span>2</span>Asientos</li>
+  <li class="{% if paso > 3 %}hecho{% elif paso == 3 %}actual{% endif %}"><span>3</span>Confitería</li>
+  <li class="{% if paso > 4 %}hecho{% elif paso == 4 %}actual{% endif %}"><span>4</span>Pago</li>
+  <li class="{% if paso > 5 %}hecho{% elif paso == 5 %}actual{% endif %}"><span>5</span>Entradas</li>
+</ol>

@@ -1,0 +1,60 @@
+{% load static %}<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Inicio{% endblock %} · Cine Nido</title>
+  {# Los colores se cambian SOLO en tema.css #}
+  <link rel="stylesheet" href="{% static 'cine_nido/css/tema.css' %}">
+  <link rel="stylesheet" href="{% static 'cine_nido/css/estilos.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <header class="cabecera">
+    <div class="contenedor cabecera-interior">
+      {% include "cine_nido/_logo.html" %}
+      <input type="checkbox" id="menu-toggle" class="menu-check">
+      <label for="menu-toggle" class="menu-btn" aria-label="Abrir menú">☰</label>
+      <nav class="nav">
+        <a href="{% url 'cartelera' %}">Cartelera</a>
+        <a href="{% url 'cartelera' %}#proximos">Próximos estrenos</a>
+        <a href="{% url 'confiteria' %}">Confitería</a>
+        <a href="{% url 'mis_compras' %}">Mis compras</a>
+        <div class="nav-acciones">
+          {% if user.is_authenticated %}
+            {% if user.is_staff %}<a href="{% url 'panel_dashboard' %}" class="btn btn-borde btn-chico">Panel</a>{% endif %}
+            <span class="suave">Hola, {{ user.first_name|default:user.username }}</span>
+          {% else %}
+            <a href="{% url 'ingresar' %}" class="btn btn-borde btn-chico">Ingresar</a>
+            <a href="{% url 'registro' %}" class="btn btn-primario btn-chico">Registrarse</a>
+          {% endif %}
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  {% if messages %}
+  <ul class="mensajes contenedor">
+    {% for m in messages %}<li class="mensaje {{ m.tags }}">{{ m }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+
+  <main>{% block contenido %}{% endblock %}</main>
+
+  <footer class="pie">
+    <div class="contenedor pie-interior">
+      <div>
+        <strong class="resaltado">Cine Nido</strong> · Desde 1946<br>
+        Eleuterio Ramírez 653, Osorno, Región de Los Lagos<br>
+        +569 12345678
+      </div>
+      <div>
+        <a href="{% url 'cartelera' %}">Cartelera</a><br>
+        <a href="{% url 'confiteria' %}">Confitería</a><br>
+        <a href="{% url 'panel_dashboard' %}">Panel interno (demo)</a>
+      </div>
+    </div>
+  </footer>
+  <script src="{% static 'cine_nido/js/app.js' %}"></script>
+</body>
+</html>

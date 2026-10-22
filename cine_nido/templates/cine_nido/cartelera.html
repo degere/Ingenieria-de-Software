@@ -1,0 +1,30 @@
+{% extends "cine_nido/base.html" %}
+{% block titulo %}Cartelera{% endblock %}
+{% block contenido %}
+<section class="hero">
+  <div class="contenedor">
+    <h1>Vive el cine en <span class="resaltado">Osorno</span></h1>
+    <p>Revisa la cartelera, elige tu asiento y compra tus entradas y confitería online. Entra solo con tu código QR.</p>
+    <form class="buscador" method="get" action="{% url 'cartelera' %}">
+      <input type="search" name="q" value="{{ q }}" placeholder="Buscar por título o género" aria-label="Buscar película">
+      <button class="btn btn-primario" type="submit">Buscar</button>
+    </form>
+  </div>
+</section>
+
+<section class="contenedor seccion" id="cartelera">
+  <h2 class="titulo-seccion">En cartelera</h2>
+  <div class="grid-peliculas">
+    {% for p in en_cartelera %}{% include "cine_nido/_tarjeta_pelicula.html" %}
+    {% empty %}<p class="vacio">No encontramos películas en cartelera con ese criterio.</p>{% endfor %}
+  </div>
+</section>
+
+<section class="contenedor seccion" id="proximos">
+  <h2 class="titulo-seccion">Próximos estrenos</h2>
+  <div class="grid-peliculas">
+    {% for p in proximos %}{% include "cine_nido/_tarjeta_pelicula.html" %}
+    {% empty %}<p class="vacio">No hay próximos estrenos con ese criterio.</p>{% endfor %}
+  </div>
+</section>
+{% endblock %}
