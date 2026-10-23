@@ -1,0 +1,58 @@
+{% extends "cine_nido/panel/base_panel.html" %}
+{% block titulo %}Panel · {% if editando %}Editar{% else %}Nueva{% endif %} sala{% endblock %}
+{% block panel_contenido %}
+<div class="panel-encabezado">
+  <h1>{% if editando %}Editar sala{% else %}Nueva sala{% endif %}</h1>
+  <a class="btn btn-borde" href="{% url 'panel_listado' 'salas' %}">← Volver a salas</a>
+</div>
+
+<form class="formulario-panel" method="post" data-form-sala>
+  {% csrf_token %}
+  <section class="tarjeta">
+    <h2 class="subtitulo-form">Datos de la sala</h2>
+    <div class="campo"><label for="nombre">Nombre o número</label><input id="nombre" name="nombre" value="{{ obj.nombre|default:'' }}" placeholder="Ej: Sala 3" required></div>
+
+    <h2 class="subtitulo-form">Distribución de asientos</h2>
+    <div class="campos-3">
+      <div class="campo"><label for="filas">Filas</label><input id="filas" type="number" name="filas" min="1" max="20" value="{{ obj.filas|default:8 }}" data-sala-filas></div>
+      <div class="campo"><label for="por_fila">Asientos por fila</label><input id="por_fila" type="number" name="por_fila" min="1" max="24" value="{{ obj.por_fila|default:12 }}" data-sala-por-fila></div>
+      <div class="campo"><label for="capacidad">Capacidad total</label><input id="capacidad" value="{% if obj %}{% widthratio obj.filas 1 obj.por_fila %}{% else %}96{% endif %}" readonly data-sala-capacidad></div>
+    </div>
+    <div class="campos-2">
+      <div class="campo"><label for="pasillo">Pasillo después del asiento</label><input id="pasillo" type="number" name="pasillo" min="0" value="{{ obj.pasillo|default:6 }}" data-sala-pasillo></div>
+      <div class="campo"><label for="accesibles">Asientos para movilidad reducida</label><input id="accesibles" type="number" name="accesibles" min="0" value="{{ obj.accesibles|default:4 }}" data-sala-accesibles><p class="ayuda">Se ubican en la última fila.</p></div>
+    </div>
+
+    <h2 class="subtitulo-form">Estado</h2>
+    <div class="opciones-estado">
+      <label class="opcion-pago"><input type="radio" name="estado" value="activa" {% if not obj or obj.estado == "activa" %}checked{% endif %}> Activa</label>
+      <label class="opcion-pago"><input type="radio" name="estado" value="mantencion" {% if obj.estado == "mantencion" %}checked{% endif %}> En mantención</label>
+    </div>
+
+    <div class="acciones-form">
+      <a class="btn btn-borde" href="{% url 'panel_listado' 'salas' %}">Cancelar</a>
+      <button class="btn btn-primario" type="submit">{% if editando %}Guardar cambios{% else %}Agregar sala{% endif %}</button>
+    </div>
+  </section>
+
+  <aside class="lateral-form">
+    <div class="tarjeta">
+      <h3>Vista previa del mapa</h3>
+      <div class="pantalla"></div>
+      <div class="mapa"><div class="mapa-interior" data-sala-vista></div></div>
+      <div class="leyenda">
+        <span><span class="asiento"></span>Asiento</span>
+        <span><span class="asiento movilidad"></span>Movilidad reducida</span>
+      </div>
+    </div>
+
+    {% if editando %}
+    <div class="tarjeta zona-baja">
+      <h3>Dar de baja</h3>
+      <p class="ayuda">No se podrán programar nuevas funciones en esta sala. Se conserva su historial.</p>
+      <button class="btn btn-secundario btn-bloque" type="submit" name="accion" value="baja" formnovalidate data-confirmar="¿Seguro que quieres dar de baja esta sala?">Dar de baja sala</button>
+    </div>
+    {% endif %}
+  </aside>
+</form>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "cine_nido/panel/base_panel.html" %}
+{% block titulo %}Panel · {% if editando %}Cerrar{% else %}Abrir{% endif %} caja{% endblock %}
+{% block panel_contenido %}
+<div class="panel-encabezado">
+  <h1>{% if editando %}Cierre de caja{% else %}Apertura de caja{% endif %}</h1>
+  <a class="btn btn-borde" href="{% url 'panel_listado' 'caja' %}">← Volver a caja</a>
+</div>
+
+<form class="formulario-panel" method="post" {% if editando %}data-cierre-caja data-esperado="{{ obj.inicial|add:obj.efectivo }}"{% endif %}>
+  {% csrf_token %}
+  <section class="tarjeta">
+    {% if editando %}
+      <h2 class="subtitulo-form">{{ obj.turno }} · {{ obj.punto }}</h2>
+      <p class="suave">Responsable: {{ obj.usuario }}</p>
+      <div class="resumen">
+        <dl>
+          <dt>Monto inicial</dt><dd>${{ obj.inicial|floatformat:"0g" }}</dd>
+          <dt>Ventas en efectivo</dt><dd>${{ obj.efectivo|floatformat:"0g" }}</dd>
+          <dt>Ventas con tarjeta</dt><dd>${{ obj.tarjeta|floatformat:"0g" }}</dd>
+        </dl>
+        <div class="linea-total"><span>Efectivo esperado en caja</span><span class="valor">${{ obj.inicial|add:obj.efectivo|floatformat:"0g" }}</span></div>
+      </div>
+      <div class="campo"><label for="contado">Efectivo contado</label><input id="contado" type="number" name="contado" min="0" step="100" value="{{ obj.contado }}" required data-contado></div>
+      <div class="resultado" data-diferencia><strong>Diferencia: <span data-diferencia-valor>$0</span></strong><br><span class="suave" data-diferencia-texto>La caja cuadra.</span></div>
+      <div class="campo"><label for="observaciones">Observaciones</label><textarea id="observaciones" name="observaciones" rows="3" placeholder="Explica la diferencia, si la hay"></textarea></div>
+    {% else %}
+      <h2 class="subtitulo-form">Datos del turno</h2>
+      <div class="campos-2">
+        <div class="campo"><label for="responsable">Responsable</label>
+          <input id="responsable" name="responsable" required autocomplete="off" placeholder="Nombre del responsable">
+        </div>
+        <div class="campo"><label for="punto">Punto de venta</label>
+          <select id="punto" name="punto"><option>Boletería</option><option>Confitería</option></select>
+        </div>
+      </div>
+      <div class="campo"><label for="inicial">Monto inicial en efectivo</label><input id="inicial" type="number" name="inicial" min="0" step="100" placeholder="30000" required><p class="ayuda">Dinero con el que parte la caja (sencillo para vueltos).</p></div>
+    {% endif %}
+
+    <div class="acciones-form">
+      <a class="btn btn-borde" href="{% url 'panel_listado' 'caja' %}">Cancelar</a>
+      <button class="btn btn-primario" type="submit">{% if editando %}Cerrar caja{% else %}Abrir caja{% endif %}</button>
+    </div>
+  </section>
+
+  <aside class="lateral-form">
+    <div class="tarjeta">
+      <h3>¿Cómo funciona?</h3>
+      <ol class="pasos-ayuda">
+        <li>Al iniciar el turno se abre la caja con el monto inicial.</li>
+        <li>Durante el turno el sistema suma las ventas por medio de pago.</li>
+        <li>Al cerrar, se cuenta el efectivo y el sistema calcula la diferencia.</li>
+      </ol>
+    </div>
+  </aside>
+</form>
+{% endblock %}

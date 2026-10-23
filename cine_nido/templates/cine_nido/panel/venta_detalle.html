@@ -1,0 +1,60 @@
+{% extends "cine_nido/panel/base_panel.html" %}
+{% block titulo %}Panel · Venta {{ compra.numero }}{% endblock %}
+{% block panel_contenido %}
+<div class="panel-encabezado">
+  <h1>Venta {{ compra.numero }}</h1>
+  <a class="btn btn-borde" href="{% url 'panel_listado' 'ventas' %}">← Volver a ventas</a>
+</div>
+
+<div class="formulario-panel">
+  <section class="tarjeta">
+    <div class="etiquetas">
+      <span class="badge badge-{{ compra.estado.badge }}">{{ compra.estado.texto }}</span>
+      <span class="badge">{{ compra.canal }}</span>
+    </div>
+    <dl class="ficha">
+      <dt>Fecha</dt><dd>{{ compra.fecha|date:"d/m/Y" }}</dd>
+      <dt>Película</dt><dd>{{ compra.pelicula }}</dd>
+      <dt>Función</dt><dd>{{ compra.funcion }}</dd>
+      <dt>Asientos</dt><dd>{{ compra.asientos }}</dd>
+      <dt>Correo</dt><dd>{{ compra.correo }}</dd>
+    </dl>
+
+    <div class="tabla-contenedor">
+      <table>
+        <thead><tr><th>Detalle</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th></tr></thead>
+        <tbody>
+          {% for i in compra.items %}
+          <tr><td>{{ i.nombre }}</td><td>{{ i.cantidad }}</td><td>${{ i.precio|floatformat:"0g" }}</td><td>${{ i.subtotal|floatformat:"0g" }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="linea-total"><span>Total</span><span class="valor">${{ compra.total|floatformat:"0g" }}</span></div>
+
+    {% if compra.motivo_anulacion %}
+    <div class="resultado error"><strong>Venta anulada</strong><br><span class="suave">Motivo: {{ compra.motivo_anulacion }}</span></div>
+    {% endif %}
+  </section>
+
+  <aside class="lateral-form">
+    <div class="tarjeta">
+      <h3>Acciones</h3>
+      <div class="acciones-columna">
+        <a class="btn btn-borde btn-bloque" href="{% url 'entrada' compra.id %}">Ver comprobante y QR</a>
+        <a class="btn btn-borde btn-bloque" href="#">Reenviar al correo</a>
+      </div>
+    </div>
+
+    {% if compra.estado.texto != "Anulada" %}
+    <form class="tarjeta zona-baja" method="post">
+      {% csrf_token %}
+      <h3>Anular venta</h3>
+      <p class="ayuda">Solo antes del inicio de la función. Se liberan los asientos y se gestiona la devolución.</p>
+      <div class="campo"><label for="motivo">Motivo</label><textarea id="motivo" name="motivo" rows="2" required></textarea></div>
+      <button class="btn btn-secundario btn-bloque" type="submit" data-confirmar="¿Seguro que quieres anular esta venta?">Anular venta</button>
+    </form>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

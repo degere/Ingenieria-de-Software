@@ -18,7 +18,7 @@
     <a href="{% url 'panel_listado' 'usuarios' %}" class="{% if seccion_activa == 'usuarios' %}activo{% endif %}">Usuarios</a>
     <a href="{% url 'panel_listado' 'reportes' %}" class="{% if seccion_activa == 'reportes' %}activo{% endif %}">Reportes</a>
   </nav>
-  {# DEMO: el menú mostrará solo las opciones del rol del usuario (R5) cuando exista el backend. #}
+  {# DEMO: el panel estará disponible solo para cuentas de administrador cuando exista autenticación. #}
   <section>{% block panel_contenido %}{% endblock %}</section>
 </div>
 {% endblock %}

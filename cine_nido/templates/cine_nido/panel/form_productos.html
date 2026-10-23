@@ -1,0 +1,65 @@
+{% extends "cine_nido/panel/base_panel.html" %}
+{% block titulo %}Panel · {% if editando %}Editar{% else %}Nuevo{% endif %} producto{% endblock %}
+{% block panel_contenido %}
+<div class="panel-encabezado">
+  <h1>{% if editando %}Editar producto{% else %}Nuevo producto{% endif %}</h1>
+  <a class="btn btn-borde" href="{% url 'panel_listado' 'productos' %}">← Volver a productos</a>
+</div>
+
+<form class="formulario-panel" method="post">
+  {% csrf_token %}
+  <section class="tarjeta">
+    <h2 class="subtitulo-form">Datos del producto</h2>
+    <div class="campos-2">
+      <div class="campo"><label for="nombre">Nombre</label><input id="nombre" name="nombre" value="{{ obj.nombre|default:'' }}" placeholder="Ej: Cabritas grandes" required data-vista-titulo></div>
+      <div class="campo"><label for="categoria">Categoría</label>
+        <select id="categoria" name="categoria" data-categoria>
+          {% for c in categorias %}<option {% if obj.categoria == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="campo"><label for="detalle">Descripción</label><input id="detalle" name="detalle" value="{{ obj.detalle|default:'' }}" placeholder="Ej: Saladas o acarameladas" data-vista-detalle></div>
+    <div class="campos-3">
+      <div class="campo"><label for="precio">Precio</label><input id="precio" type="number" name="precio" min="0" step="100" value="{{ obj.precio|default:'' }}" placeholder="4500" required data-vista-precio></div>
+      <div class="campo"><label for="stock">Stock disponible</label><input id="stock" type="number" name="stock" min="0" value="{{ stock|default:'' }}" placeholder="50"></div>
+      <div class="campo"><label for="stock_minimo">Stock mínimo</label><input id="stock_minimo" type="number" name="stock_minimo" min="0" value="10"><p class="ayuda">Bajo este número se avisa al encargado.</p></div>
+    </div>
+    <div class="campo"><label for="foto">URL de la foto</label><input id="foto" type="url" name="foto" placeholder="https://..."></div>
+
+    <div class="bloque-combo" data-si-combo {% if obj.categoria != "Combos" %}hidden{% endif %}>
+      <h2 class="subtitulo-form">Productos que incluye el combo</h2>
+      <div class="lista-checks">
+        {% for c in componentes %}
+        <label class="opcion-pago"><input type="checkbox" name="componentes" value="{{ c.id }}"> {{ c.nombre }}</label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="acciones-form">
+      <a class="btn btn-borde" href="{% url 'panel_listado' 'productos' %}">Cancelar</a>
+      <button class="btn btn-primario" type="submit">{% if editando %}Guardar cambios{% else %}Agregar producto{% endif %}</button>
+    </div>
+  </section>
+
+  <aside class="lateral-form">
+    <div class="tarjeta">
+      <h3>Vista previa</h3>
+      <p class="ayuda">Así se verá en la confitería.</p>
+      <article class="producto">
+        <div class="producto-foto">{{ obj.emoji|default:"🍿" }}</div>
+        <h4 data-vista-salida-titulo>{{ obj.nombre|default:"Nombre del producto" }}</h4>
+        <p class="meta" data-vista-salida-detalle>{{ obj.detalle|default:"Descripción" }}</p>
+        <span class="precio" data-vista-salida-precio>{% if obj %}${{ obj.precio|floatformat:"0g" }}{% else %}$0{% endif %}</span>
+      </article>
+    </div>
+
+    {% if editando %}
+    <div class="tarjeta zona-baja">
+      <h3>Dar de baja</h3>
+      <p class="ayuda">El producto deja de ofrecerse, pero se conserva su historial de ventas.</p>
+      <button class="btn btn-secundario btn-bloque" type="submit" name="accion" value="baja" formnovalidate data-confirmar="¿Seguro que quieres dar de baja este producto?">Dar de baja producto</button>
+    </div>
+    {% endif %}
+  </aside>
+</form>
+{% endblock %}

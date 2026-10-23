@@ -70,6 +70,35 @@ COMPRAS = [
     {"id": 101, "numero": "CN-000101", "fecha": HOY - timedelta(days=40), "pelicula": "Código Rojo", "total": 11000, "estado": {"texto": "Anulada", "badge": "error"}, "canal": "Online"},
 ]
 
+GENEROS = ["Acción", "Animación", "Aventura", "Ciencia ficción", "Comedia", "Drama", "Romance", "Suspenso", "Terror"]
+CLASIFICACIONES = ["TE", "+7", "+10", "+14", "+18"]
+IDIOMAS = ["Doblada", "Subtitulada"]
+FORMATOS = ["2D", "3D"]
+ESTADOS_PELICULA = [("proximo", "Próximo estreno"), ("en_cartelera", "En cartelera"), ("fuera", "Fuera de cartelera")]
+CATEGORIAS = ["Combos", "Cabritas", "Bebidas", "Dulces"]
+TIPOS_CUENTA = ["Cliente", "Administrador"]
+
+SALAS = [
+    {"id": 1, "nombre": "Sala 1", "filas": 8, "por_fila": 12, "accesibles": 4, "pasillo": 6, "estado": "activa"},
+    {"id": 2, "nombre": "Sala 2", "filas": 8, "por_fila": 12, "accesibles": 4, "pasillo": 6, "estado": "activa"},
+]
+
+USUARIOS = [
+    {"id": 1, "nombre": "Ana Pérez", "rut": "15.432.876-1", "telefono": "+56 9 8765 4321", "correo": "ana@correo.cl", "tipo_cuenta": "Cliente", "activo": True},
+    {"id": 2, "nombre": "José Sosa", "rut": "12.345.678-9", "telefono": "+56 9 1234 5678", "correo": "jose@cinenido.cl", "tipo_cuenta": "Administrador", "activo": True},
+]
+
+CAJAS = [
+    {"id": 1, "turno": "Ayer tarde", "usuario": "Luis Soto", "punto": "Boletería", "inicial": 30000, "efectivo": 120500, "tarjeta": 95000, "contado": 150500},
+    {"id": 2, "turno": "Ayer noche", "usuario": "Marta Díaz", "punto": "Confitería", "inicial": 20000, "efectivo": 54300, "tarjeta": 44000, "contado": 72800},
+]
+
+DETALLE_COMPRAS = {
+    123: {"funcion": "Sala 1 · 20:30", "asientos": "D5, D6", "items": [("Entrada general", 2, 5500), ("Combo Nido (2 personas)", 1, 9900)], "correo": "ana@correo.cl"},
+    118: {"funcion": "Sala 2 · 18:00", "asientos": "F3, F4", "items": [("Entrada estudiante", 2, 4500)], "correo": "—"},
+    101: {"funcion": "Sala 1 · 15:30", "asientos": "C7, C8", "items": [("Entrada general", 2, 5500)], "correo": "pedro@correo.cl", "motivo_anulacion": "Cliente no podía asistir"},
+}
+
 PANEL_SECCIONES = {
     "peliculas": {"titulo": "Películas", "nuevo": "Nueva película",
         "columnas": ["Título", "Género", "Duración", "Clasificación", "Estado"],
@@ -80,7 +109,7 @@ PANEL_SECCIONES = {
         "filas": [[next(p["nombre"] for p in PELICULAS if p["id"] == f["pelicula_id"]), f["sala"], f["fecha"].strftime("%d/%m/%Y"), f["hora"], "%d / 96" % ((f["id"] * 7) % 96)] for f in FUNCIONES[:12]]},
     "salas": {"titulo": "Salas", "nuevo": "Nueva sala",
         "columnas": ["Sala", "Capacidad", "Filas", "Asientos accesibles", "Estado"],
-        "filas": [["Sala 1", 96, 8, 4, {"texto": "Activa", "badge": "ok"}], ["Sala 2", 96, 8, 4, {"texto": "Activa", "badge": "ok"}]]},
+        "filas": [[s["nombre"], s["filas"] * s["por_fila"], s["filas"], s["accesibles"], {"texto": "Activa", "badge": "ok"}] for s in SALAS]},
     "productos": {"titulo": "Productos de confitería", "nuevo": "Nuevo producto",
         "columnas": ["Producto", "Categoría", "Precio", "Stock"],
         "filas": [[p["nombre"], p["categoria"], _clp(p["precio"]), {"texto": str(8 + p["id"] * 5), "badge": "aviso"} if p["id"] in (3, 6) else str(8 + p["id"] * 5)] for p in PRODUCTOS]},
@@ -88,12 +117,12 @@ PANEL_SECCIONES = {
         "columnas": ["N° venta", "Fecha", "Película", "Canal", "Total", "Estado"],
         "filas": [[c["numero"], c["fecha"].strftime("%d/%m/%Y"), c["pelicula"], c["canal"], _clp(c["total"]), c["estado"]] for c in COMPRAS]},
     "usuarios": {"titulo": "Usuarios", "nuevo": "Nuevo usuario",
-        "columnas": ["Nombre", "Correo", "Rol", "Estado"],
-        "filas": [["Ana Pérez", "ana@correo.cl", "Cliente", {"texto": "Activo", "badge": "ok"}], ["Luis Soto", "luis@cinenido.cl", "Vendedor", {"texto": "Activo", "badge": "ok"}],
-                  ["Marta Díaz", "marta@cinenido.cl", "Encargada de confitería", {"texto": "Activo", "badge": "ok"}], ["José Sosa", "jose@cinenido.cl", "Administrador", {"texto": "Activo", "badge": "ok"}]]},
+        "columnas": ["Nombre", "Correo", "Tipo de cuenta", "Estado"],
+        "filas": [[u["nombre"], u["correo"], u["tipo_cuenta"], {"texto": "Activo", "badge": "ok"}] for u in USUARIOS]},
     "caja": {"titulo": "Caja (apertura y cierre)", "nuevo": "Abrir caja",
-        "columnas": ["Turno", "Usuario", "Monto inicial", "Ventas", "Diferencia"],
-        "filas": [["Ayer tarde", "Luis Soto", "$30.000", "$215.500", {"texto": "$0", "badge": "ok"}], ["Ayer noche", "Marta Díaz", "$20.000", "$98.300", {"texto": "-$1.500", "badge": "error"}]]},
+        "columnas": ["Turno", "Responsable", "Monto inicial", "Ventas", "Diferencia"],
+        "filas": [[c["turno"], c["usuario"], _clp(c["inicial"]), _clp(c["efectivo"] + c["tarjeta"]),
+                   {"texto": _clp(c["contado"] - c["inicial"] - c["efectivo"]).replace("$-", "-$"), "badge": "ok" if c["contado"] == c["inicial"] + c["efectivo"] else "error"}] for c in CAJAS]},
     "reportes": {"titulo": "Reportes", "nuevo": None,
         "columnas": ["Reporte", "Período", "Formato"],
         "filas": [["Ventas de entradas", "Último mes", "PDF / Excel"], ["Ventas de confitería", "Último mes", "PDF / Excel"], ["Ocupación por sala", "Última semana", "PDF / Excel"]]},
@@ -137,3 +166,22 @@ def mapa_sala(funcion_id):
             asientos.append({"codigo": "%s%d" % (letra, n), "numero": n, "estado": estado, "pasillo": n == 6})
         filas.append({"letra": letra, "asientos": asientos})
     return filas
+
+
+SECCIONES_CON_FORMULARIO = ["peliculas", "funciones", "salas", "productos", "usuarios", "caja"]
+
+
+def obtener_registro(seccion, pk):
+    fuentes = {"peliculas": PELICULAS, "funciones": FUNCIONES, "salas": SALAS, "productos": PRODUCTOS,
+               "usuarios": USUARIOS, "caja": CAJAS}
+    lista = fuentes.get(seccion, [])
+    return lista[pk - 1] if 0 < pk <= len(lista) else None
+
+
+def obtener_compra(pk):
+    if not 0 < pk <= len(COMPRAS):
+        return None
+    compra = dict(COMPRAS[pk - 1])
+    compra.update(DETALLE_COMPRAS.get(compra["id"], {}))
+    compra["items"] = [{"nombre": n, "cantidad": c, "precio": p, "subtotal": c * p} for n, c, p in compra.get("items", [])]
+    return compra

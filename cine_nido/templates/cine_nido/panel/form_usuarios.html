@@ -1,0 +1,60 @@
+{% extends "cine_nido/panel/base_panel.html" %}
+{% block titulo %}Panel · {% if editando %}Editar{% else %}Nuevo{% endif %} usuario{% endblock %}
+{% block panel_contenido %}
+<div class="panel-encabezado">
+  <h1>{% if editando %}Editar usuario{% else %}Nuevo usuario{% endif %}</h1>
+  <a class="btn btn-borde" href="{% url 'panel_listado' 'usuarios' %}">← Volver a usuarios</a>
+</div>
+
+<form class="formulario-panel" method="post">
+  {% csrf_token %}
+  <section class="tarjeta">
+    <h2 class="subtitulo-form">Datos personales</h2>
+    <div class="campo"><label for="nombre">Nombre completo</label><input id="nombre" name="nombre" value="{{ obj.nombre|default:'' }}" required autocomplete="off"></div>
+    <div class="campos-2">
+      <div class="campo"><label for="rut">RUT</label><input id="rut" name="rut" value="{{ obj.rut|default:'' }}" placeholder="12.345.678-9" required></div>
+      <div class="campo"><label for="telefono">Teléfono</label><input id="telefono" type="tel" name="telefono" value="{{ obj.telefono|default:'' }}" placeholder="+56 9 1234 5678"></div>
+    </div>
+    <div class="campo"><label for="correo">Correo</label><input id="correo" type="email" name="correo" value="{{ obj.correo|default:'' }}" required autocomplete="off"></div>
+
+    <h2 class="subtitulo-form">Tipo de cuenta</h2>
+    <div class="campo"><label for="tipo_cuenta">Tipo de cuenta</label>
+      <select id="tipo_cuenta" name="tipo_cuenta">
+        {% for tipo in tipos_cuenta %}<option {% if obj.tipo_cuenta == tipo %}selected{% endif %}>{{ tipo }}</option>{% endfor %}
+      </select>
+      <p class="ayuda">Las cuentas disponibles son de cliente y de administrador.</p>
+    </div>
+    {% if editando %}
+      <p class="ayuda">Para cambiar la contraseña, el usuario debe usar "¿Olvidaste tu contraseña?" desde la pantalla de ingreso.</p>
+    {% else %}
+    <div class="campos-2">
+      <div class="campo"><label for="clave">Contraseña</label><input id="clave" type="password" name="clave" required autocomplete="new-password"></div>
+      <div class="campo"><label for="clave2">Repetir contraseña</label><input id="clave2" type="password" name="clave2" required autocomplete="new-password"></div>
+    </div>
+    {% endif %}
+
+    <div class="acciones-form">
+      <a class="btn btn-borde" href="{% url 'panel_listado' 'usuarios' %}">Cancelar</a>
+      <button class="btn btn-primario" type="submit">{% if editando %}Guardar cambios{% else %}Crear usuario{% endif %}</button>
+    </div>
+  </section>
+
+  <aside class="lateral-form">
+    <div class="tarjeta">
+      <h3>Tipos de cuenta</h3>
+      <dl class="ficha">
+        <dt>Cliente</dt><dd>Compra entradas y confitería</dd>
+        <dt>Administrador</dt><dd>Gestiona el panel y los reportes</dd>
+      </dl>
+    </div>
+
+    {% if editando %}
+    <div class="tarjeta zona-baja">
+      <h3>Dar de baja</h3>
+      <p class="ayuda">El usuario ya no podrá ingresar, pero se conserva su historial de compras y ventas.</p>
+      <button class="btn btn-secundario btn-bloque" type="submit" name="accion" value="baja" formnovalidate data-confirmar="¿Seguro que quieres dar de baja este usuario?">Dar de baja usuario</button>
+    </div>
+    {% endif %}
+  </aside>
+</form>
+{% endblock %}
