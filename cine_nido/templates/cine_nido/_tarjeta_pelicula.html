@@ -1,0 +1,17 @@
+<article class="tarjeta-pelicula">
+  <a href="{% url 'pelicula_detalle' p.id %}" class="afiche" aria-label="{{ p.nombre }}">
+    {% if p.portada %}<img src="{{ p.portada }}" alt="Afiche de {{ p.nombre }}" loading="lazy">
+    {% else %}<div class="afiche-vacio"><span>{{ p.nombre }}</span></div>{% endif %}
+    <span class="badge badge-clasificacion">{{ p.clasificacion }}</span>
+  </a>
+  <div class="tarjeta-cuerpo">
+    <h3>{{ p.nombre }}</h3>
+    <p class="meta">{{ p.genero }} · {{ p.duracion }} min</p>
+    {% if p.estado == "proximo" %}
+      <p class="meta">Estreno: {{ p.fecha_estreno|date:"j \d\e F" }}</p>
+      <a class="btn btn-borde btn-bloque" href="{% url 'pelicula_detalle' p.id %}">Ver ficha</a>
+    {% else %}
+      <a class="btn btn-primario btn-bloque" href="{% url 'pelicula_detalle' p.id %}">Ver horarios</a>
+    {% endif %}
+  </div>
+</article>

@@ -1,0 +1,44 @@
+{% extends "cine_nido/base.html" %}
+{% block titulo %}Tus entradas{% endblock %}
+{% block contenido %}
+<div class="contenedor" style="max-width:820px">
+  {% include "cine_nido/_pasos.html" with paso=5 %}
+
+  <h1 style="font-size:1.5rem">¡Compra realizada! <span class="badge badge-ok">{{ compra.estado.texto }}</span></h1>
+  <p class="suave">Venta {{ compra.numero }} · {{ compra.fecha|date:"j \d\e F \d\e Y" }}. También enviamos esta información a tu correo.</p>
+
+  {# DEMO: una entrada de ejemplo. En el backend se genera una por asiento (R33). #}
+  <article class="entrada">
+    <div class="entrada-info">
+      <p class="suave" style="margin:0">Cine Nido · Eleuterio Ramírez 653</p>
+      <h3>{{ compra.pelicula }}</h3>
+      <dl class="ficha">
+        <dt>Sala</dt><dd>Sala 1</dd>
+        <dt>Fecha</dt><dd>{{ compra.fecha|date:"d/m/Y" }}</dd>
+        <dt>Hora</dt><dd>20:30</dd>
+        <dt>Asientos</dt><dd>D5, D6</dd>
+        <dt>Total</dt><dd>${{ compra.total|floatformat:"0g" }}</dd>
+      </dl>
+    </div>
+    <div class="entrada-qr">
+      <div>{% include "cine_nido/_qr_placeholder.html" %}<small>Presenta este código al ingresar</small></div>
+    </div>
+  </article>
+
+  <article class="entrada">
+    <div class="entrada-info">
+      <h3>Retiro de confitería</h3>
+      <p class="suave" style="margin:0">1 × Combo Nido (2 personas)</p>
+    </div>
+    <div class="entrada-qr">
+      <div>{% include "cine_nido/_qr_placeholder.html" %}<small>Muestra este código en confitería</small></div>
+    </div>
+  </article>
+
+  <div class="acciones">
+    <a class="btn btn-primario" href="#">Descargar comprobante (PDF)</a>
+    <a class="btn btn-borde" href="#" onclick="window.print(); return false;">Imprimir</a>
+    <a class="btn btn-borde" href="{% url 'cartelera' %}">Volver a la cartelera</a>
+  </div>
+</div>
+{% endblock %}

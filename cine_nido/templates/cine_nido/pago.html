@@ -1,0 +1,42 @@
+{% extends "cine_nido/base.html" %}
+{% block titulo %}Pago{% endblock %}
+{% block contenido %}
+<div class="contenedor">
+  {% include "cine_nido/_pasos.html" with paso=4 %}
+
+  {# DEMO: el pago real se hará con una pasarela externa certificada (R31, R49). Aquí NO se piden datos de tarjeta. #}
+  <form class="compra" method="post" action="{% url 'entrada' 123 %}">
+    {% csrf_token %}
+    <section class="tarjeta">
+      <h1 style="font-size:1.4rem">Confirma y paga</h1>
+
+      <div class="campo">
+        <label for="correo">Correo para enviar tus entradas</label>
+        <input id="correo" type="email" name="correo" placeholder="tucorreo@ejemplo.cl" required>
+        <p class="ayuda">Te enviaremos el comprobante y las entradas con código QR.</p>
+      </div>
+
+      <h3>Medio de pago</h3>
+      <div class="opciones-pago">
+        <label class="opcion-pago"><input type="radio" name="medio" value="debito" checked> Tarjeta de débito</label>
+        <label class="opcion-pago"><input type="radio" name="medio" value="credito"> Tarjeta de crédito</label>
+      </div>
+      <p class="ayuda">Serás redirigido a la pasarela de pago segura. Cine Nido no almacena los datos de tu tarjeta.</p>
+    </section>
+
+    <aside class="tarjeta resumen">
+      <div class="temporizador" data-temporizador="480">Tu reserva vence en <strong>08:00</strong></div>
+      <h3>Detalle de la compra</h3>
+      <dl>
+        <dt>Película</dt><dd>{{ resumen.pelicula }}</dd>
+        <dt>Función</dt><dd>{{ resumen.funcion }}</dd>
+        <dt>Asientos</dt><dd>{{ resumen.asientos }}</dd>
+        <dt>Entradas</dt><dd>${{ resumen.entradas|floatformat:"0g" }}</dd>
+        <dt>Confitería</dt><dd>${{ resumen.confiteria|floatformat:"0g" }}</dd>
+      </dl>
+      <div class="linea-total"><span>Total a pagar</span><span class="valor">${{ resumen.total|floatformat:"0g" }}</span></div>
+      <button type="submit" class="btn btn-primario btn-bloque">Pagar ahora</button>
+    </aside>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "cine_nido/base.html" %}
+{% block titulo %}Panel{% endblock %}
+{% block contenido %}
+<div class="contenedor panel">
+  <nav class="panel-menu" aria-label="Menú del panel">
+    <a href="{% url 'panel_dashboard' %}" class="{% if seccion_activa == 'dashboard' %}activo{% endif %}">Resumen</a>
+    <div class="grupo">Programación</div>
+    <a href="{% url 'panel_listado' 'peliculas' %}" class="{% if seccion_activa == 'peliculas' %}activo{% endif %}">Películas</a>
+    <a href="{% url 'panel_listado' 'funciones' %}" class="{% if seccion_activa == 'funciones' %}activo{% endif %}">Funciones</a>
+    <a href="{% url 'panel_listado' 'salas' %}" class="{% if seccion_activa == 'salas' %}activo{% endif %}">Salas</a>
+    <div class="grupo">Confitería</div>
+    <a href="{% url 'panel_listado' 'productos' %}" class="{% if seccion_activa == 'productos' %}activo{% endif %}">Productos y stock</a>
+    <div class="grupo">Operación</div>
+    <a href="{% url 'panel_listado' 'ventas' %}" class="{% if seccion_activa == 'ventas' %}activo{% endif %}">Ventas</a>
+    <a href="{% url 'panel_listado' 'caja' %}" class="{% if seccion_activa == 'caja' %}activo{% endif %}">Caja</a>
+    <a href="{% url 'panel_validar' %}" class="{% if seccion_activa == 'validar' %}activo{% endif %}">Validar QR</a>
+    <div class="grupo">Administración</div>
+    <a href="{% url 'panel_listado' 'usuarios' %}" class="{% if seccion_activa == 'usuarios' %}activo{% endif %}">Usuarios</a>
+    <a href="{% url 'panel_listado' 'reportes' %}" class="{% if seccion_activa == 'reportes' %}activo{% endif %}">Reportes</a>
+  </nav>
+  {# DEMO: el menú mostrará solo las opciones del rol del usuario (R5) cuando exista el backend. #}
+  <section>{% block panel_contenido %}{% endblock %}</section>
+</div>
+{% endblock %}

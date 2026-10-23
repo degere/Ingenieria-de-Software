@@ -1,0 +1,31 @@
+{% extends "cine_nido/panel/base_panel.html" %}
+{% block titulo %}Panel · Resumen{% endblock %}
+{% block panel_contenido %}
+<div class="panel-encabezado"><h1>Resumen del día</h1><span class="suave">Datos de ejemplo</span></div>
+
+<div class="kpis">
+  <div class="kpi"><div class="valor">$312.400</div><div class="etiqueta">Ventas de hoy</div></div>
+  <div class="kpi"><div class="valor">84</div><div class="etiqueta">Entradas vendidas</div></div>
+  <div class="kpi"><div class="valor">61%</div><div class="etiqueta">Ocupación promedio</div></div>
+  <div class="kpi"><div class="valor">2</div><div class="etiqueta">Productos con stock bajo</div></div>
+</div>
+
+<div class="paneles-2">
+  <div>
+    <h2 style="font-size:1.1rem">Próximas funciones</h2>
+    <div class="tabla-contenedor">
+      <table>
+        <thead><tr><th>Película</th><th>Sala</th><th>Hora</th></tr></thead>
+        <tbody>
+          {% for f in proximas %}<tr><td>{{ f.pelicula }}</td><td>{{ f.sala }}</td><td>{{ f.hora }}</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div>
+    <h2 style="font-size:1.1rem">Alertas de stock (R30)</h2>
+    <div class="resultado aviso"><strong>Cabritas grandes</strong><br><span class="suave">Quedan 6 unidades (mínimo 10)</span></div>
+    <div class="resultado aviso"><strong>Agua mineral</strong><br><span class="suave">Quedan 4 unidades (mínimo 12)</span></div>
+  </div>
+</div>
+{% endblock %}

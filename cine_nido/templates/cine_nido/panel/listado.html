@@ -1,0 +1,35 @@
+{% extends "cine_nido/panel/base_panel.html" %}
+{% block titulo %}Panel · {{ datos.titulo }}{% endblock %}
+{% block panel_contenido %}
+<div class="panel-encabezado">
+  <h1>{{ datos.titulo }}</h1>
+  {% if datos.nuevo %}<a class="btn btn-primario" href="#">+ {{ datos.nuevo }}</a>{% endif %}
+</div>
+
+<form class="barra-herramientas" method="get">
+  <input type="search" name="q" placeholder="Buscar en {{ datos.titulo|lower }}" aria-label="Buscar">
+  <button class="btn btn-borde" type="submit">Buscar</button>
+  {% if seccion_activa == "reportes" or seccion_activa == "ventas" %}
+    <a class="btn btn-borde" href="#">Exportar PDF</a><a class="btn btn-borde" href="#">Exportar Excel</a>
+  {% endif %}
+</form>
+
+{# Plantilla genérica: sirve para cualquier sección. Cada celda puede ser texto o {texto, badge}. #}
+<div class="tabla-contenedor">
+  <table>
+    <thead>
+      <tr>{% for c in datos.columnas %}<th>{{ c }}</th>{% endfor %}<th></th></tr>
+    </thead>
+    <tbody>
+      {% for fila in datos.filas %}
+      <tr>
+        {% for celda in fila %}
+          <td>{% if celda.badge %}<span class="badge badge-{{ celda.badge }}">{{ celda.texto }}</span>{% else %}{{ celda }}{% endif %}</td>
+        {% endfor %}
+        <td><a class="btn btn-borde btn-chico" href="#">Editar</a></td>
+      </tr>
+      {% empty %}<tr><td colspan="{{ datos.columnas|length|add:1 }}" class="vacio">Sin registros.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

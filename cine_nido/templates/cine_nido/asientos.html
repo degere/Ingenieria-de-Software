@@ -1,0 +1,67 @@
+{% extends "cine_nido/base.html" %}
+{% block titulo %}Elegir asientos{% endblock %}
+{% block contenido %}
+<div class="contenedor">
+  {% include "cine_nido/_pasos.html" with paso=2 %}
+
+  {# DEMO: el formulario envía a la confitería. El backend deberá reservar los asientos 10 minutos (R21). #}
+  <form class="compra" method="post" action="{% url 'confiteria' %}" data-asientos>
+    {% csrf_token %}
+    <section class="tarjeta">
+      <h1 style="font-size:1.4rem">{{ pelicula.nombre }}</h1>
+      <p class="suave">{{ funcion.fecha|date:"l j \d\e F" }} · {{ funcion.hora }} · {{ funcion.sala }}</p>
+
+      <div class="pantalla" aria-hidden="true"></div>
+      <div class="mapa">
+        <div class="mapa-interior">
+          {% for fila in mapa %}
+          <div class="fila">
+            <span class="fila-letra">{{ fila.letra }}</span>
+            {% for a in fila.asientos %}
+              {% if a.estado == "ocupado" or a.estado == "reservado" %}
+                <span class="asiento {{ a.estado }}{% if a.pasillo %} pasillo{% endif %}" title="{{ a.codigo }} · {{ a.estado|capfirst }}">{{ a.numero }}</span>
+              {% else %}
+                <label class="asiento-opcion{% if a.pasillo %} pasillo{% endif %}" title="{{ a.codigo }}{% if a.estado == 'movilidad' %} · Movilidad reducida{% endif %}">
+                  <input type="checkbox" name="asientos" value="{{ a.codigo }}">
+                  <span class="asiento {{ a.estado }}">{% if a.estado == "movilidad" %}♿{% else %}{{ a.numero }}{% endif %}</span>
+                </label>
+              {% endif %}
+            {% endfor %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="leyenda">
+        <span><span class="asiento"></span>Disponible</span>
+        <span><span class="asiento" style="background:var(--asiento-seleccionado)"></span>Seleccionado</span>
+        <span><span class="asiento ocupado"></span>Ocupado</span>
+        <span><span class="asiento reservado"></span>Reservado</span>
+        <span><span class="asiento movilidad"></span>Movilidad reducida</span>
+      </div>
+    </section>
+
+    <aside class="tarjeta resumen">
+      <div class="temporizador" data-temporizador="600">Tu reserva vence en <strong>10:00</strong></div>
+      <h3>Tu selección</h3>
+      <dl>
+        <dt>Película</dt><dd>{{ pelicula.nombre }}</dd>
+        <dt>Sala</dt><dd>{{ funcion.sala }}</dd>
+        <dt>Horario</dt><dd>{{ funcion.hora }}</dd>
+        <dt>Asientos</dt><dd data-lista>Ninguno</dd>
+      </dl>
+      <div class="campo">
+        <label for="tipo_entrada">Tipo de entrada</label>
+        <select id="tipo_entrada" name="tipo_entrada">
+          <option value="general" data-precio="{{ precios.general }}">General · ${{ precios.general|floatformat:"0g" }}</option>
+          <option value="estudiante" data-precio="{{ precios.estudiante }}">Estudiante · ${{ precios.estudiante|floatformat:"0g" }}</option>
+          <option value="adulto_mayor" data-precio="{{ precios.adulto_mayor }}">Adulto mayor · ${{ precios.adulto_mayor|floatformat:"0g" }}</option>
+        </select>
+      </div>
+      <div class="linea-total"><span>Total</span><span class="valor" data-total>$0</span></div>
+      <button type="submit" class="btn btn-primario btn-bloque" data-continuar disabled>Continuar a confitería</button>
+      <a class="btn btn-borde btn-bloque" style="margin-top:.5rem" href="{% url 'pelicula_detalle' pelicula.id %}">Cambiar función</a>
+    </aside>
+  </form>
+</div>
+{% endblock %}

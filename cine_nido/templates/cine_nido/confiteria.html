@@ -1,0 +1,51 @@
+{% extends "cine_nido/base.html" %}
+{% block titulo %}Confitería{% endblock %}
+{% block contenido %}
+<div class="contenedor">
+  {% include "cine_nido/_pasos.html" with paso=3 %}
+
+  {# DEMO: "resumen.base" es el subtotal de entradas. En el backend saldrá de la compra en curso. #}
+  <form class="compra" method="post" action="{% url 'pago' %}" data-confiteria data-base="{{ resumen.base }}">
+    {% csrf_token %}
+    <section>
+      <h1 style="font-size:1.4rem">Confitería</h1>
+      <p class="suave">Agrega productos a tu compra y retíralos en el cine con el mismo código QR. Este paso es opcional.</p>
+
+      <nav class="subnav">
+        {% for c in categorias %}<a class="btn btn-borde btn-chico" href="#{{ c.slug }}">{{ c.nombre }}</a>{% endfor %}
+      </nav>
+
+      {% for c in categorias %}
+      <h2 class="titulo-seccion" id="{{ c.slug }}">{{ c.nombre }}</h2>
+      <div class="grid-productos">
+        {% for p in c.productos %}
+        <article class="producto">
+          <div class="producto-foto">{{ p.emoji }}</div>
+          <h4>{{ p.nombre }}</h4>
+          <p class="meta">{{ p.detalle }}</p>
+          <span class="precio">${{ p.precio|floatformat:"0g" }}</span>
+          <div class="cantidad">
+            <button type="button" data-accion="menos" aria-label="Quitar uno">−</button>
+            <input type="number" name="producto_{{ p.id }}" value="0" min="0" max="20" data-precio="{{ p.precio }}" aria-label="Cantidad de {{ p.nombre }}">
+            <button type="button" data-accion="mas" aria-label="Agregar uno">+</button>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </section>
+
+    <aside class="tarjeta resumen">
+      <h3>Resumen</h3>
+      <dl>
+        <dt>Película</dt><dd>{{ resumen.pelicula }}</dd>
+        <dt>Asientos</dt><dd>{{ resumen.asientos }}</dd>
+        <dt>Entradas</dt><dd>${{ resumen.base|floatformat:"0g" }}</dd>
+        <dt>Confitería</dt><dd data-subtotal-conf>$0</dd>
+      </dl>
+      <div class="linea-total"><span>Total</span><span class="valor" data-total>$0</span></div>
+      <button type="submit" class="btn btn-primario btn-bloque">Continuar al pago</button>
+    </aside>
+  </form>
+</div>
+{% endblock %}

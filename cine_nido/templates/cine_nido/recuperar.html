@@ -1,0 +1,16 @@
+{% extends "cine_nido/base.html" %}
+{% block titulo %}Recuperar contraseña{% endblock %}
+{% block contenido %}
+<div class="contenedor">
+  <section class="tarjeta auth">
+    <h1>Recuperar contraseña</h1>
+    <p class="suave">Escribe tu correo y te enviaremos un enlace para restablecerla.</p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="campo"><label for="correo">Correo registrado</label><input id="correo" type="email" name="correo" required></div>
+      <button class="btn btn-primario btn-bloque" type="submit">Enviar enlace</button>
+    </form>
+    <p class="centrado" style="margin-top:1rem"><a href="{% url 'ingresar' %}">Volver a ingresar</a></p>
+  </section>
+</div>
+{% endblock %}
