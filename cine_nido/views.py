@@ -1,12 +1,7 @@
-"""
-VISTAS DEL FRONTEND (TEMPORALES)
---------------------------------
-Cada vista solo arma un contexto con datos de datos_demo.py y renderiza su
-plantilla. A medida que el backend avance, se reemplaza el uso de `demo`
-por consultas reales a los modelos (Pelicula, Funcion, Asiento, etc.).
-"""
+
+from django.contrib import messages
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 from . import datos_demo as demo
 
@@ -107,7 +102,50 @@ def panel_listado(request, seccion):
     datos = demo.PANEL_SECCIONES.get(seccion)
     if not datos:
         raise Http404("Sección no encontrada")
-    return render(request, "cine_nido/panel/listado.html", _panel(seccion, {"datos": datos}))
+    return render(request, "cine_nido/panel/listado.html", _panel(seccion, {
+        "datos": datos,
+        "tiene_formulario": seccion in demo.SECCIONES_CON_FORMULARIO,
+    }))
+
+
+def panel_formulario(request, seccion, pk=None):
+    datos = demo.PANEL_SECCIONES.get(seccion)
+    if not datos or seccion not in demo.SECCIONES_CON_FORMULARIO:
+        raise Http404("Sección sin formulario")
+    obj = demo.obtener_registro(seccion, pk) if pk else None
+    if pk and obj is None:
+        raise Http404("Registro no encontrado")
+
+    if request.method == "POST":
+        if request.POST.get("accion") == "baja":
+            messages.warning(request, "Demo: el registro se daría de baja (todavía no se guarda nada).")
+        else:
+            messages.success(request, "Demo: los datos se guardarían correctamente (todavía no se guarda nada).")
+        return redirect("panel_listado", seccion)
+
+    extra = {"datos": datos, "obj": obj, "editando": pk is not None, "pk": pk}
+    if seccion == "peliculas":
+        extra.update(generos=demo.GENEROS, clasificaciones=demo.CLASIFICACIONES, idiomas=demo.IDIOMAS,
+                     formatos=demo.FORMATOS, estados=demo.ESTADOS_PELICULA)
+    elif seccion == "funciones":
+        extra.update(peliculas=[p for p in demo.PELICULAS if p["estado"] != "fuera"], salas=demo.SALAS,
+                     precios=demo.PRECIOS, vendidas=(pk * 7) % 96 if pk else 0)
+    elif seccion == "productos":
+        extra.update(categorias=demo.CATEGORIAS, componentes=[p for p in demo.PRODUCTOS if p["categoria"] != "Combos"],
+                     stock=8 + obj["id"] * 5 if obj else None)
+    elif seccion == "usuarios":
+        extra.update(tipos_cuenta=demo.TIPOS_CUENTA)
+    return render(request, "cine_nido/panel/form_%s.html" % seccion, _panel(seccion, extra))
+
+
+def panel_venta_detalle(request, pk):
+    compra = demo.obtener_compra(pk)
+    if not compra:
+        raise Http404("Venta no encontrada")
+    if request.method == "POST":
+        messages.warning(request, "Demo: la venta se anularía y los asientos quedarían libres (todavía no se guarda nada).")
+        return redirect("panel_listado", "ventas")
+    return render(request, "cine_nido/panel/venta_detalle.html", _panel("ventas", {"compra": compra}))
 
 
 def panel_validar(request):

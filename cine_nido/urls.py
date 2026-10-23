@@ -22,5 +22,8 @@ urlpatterns = [
     # Panel interno (validar va antes que la ruta genérica)
     path("panel/", views.panel_dashboard, name="panel_dashboard"),
     path("panel/validar/", views.panel_validar, name="panel_validar"),
+    path("panel/ventas/<int:pk>/", views.panel_venta_detalle, name="panel_venta_detalle"),
+    path("panel/<str:seccion>/nuevo/", views.panel_formulario, name="panel_nuevo"),
+    path("panel/<str:seccion>/<int:pk>/editar/", views.panel_formulario, name="panel_editar"),
     path("panel/<str:seccion>/", views.panel_listado, name="panel_listado"),
 ]

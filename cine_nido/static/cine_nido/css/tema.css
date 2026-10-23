@@ -1,11 +1,3 @@
-/* ==========================================================================
-   TEMA - CINE NIDO
-   --------------------------------------------------------------------------
-   ESTE ES EL ÚNICO ARCHIVO QUE HAY QUE TOCAR PARA CAMBIAR LOS COLORES.
-   Todo el sitio (estilos.css) usa estas variables, así que al cambiar un
-   valor aquí cambia en todas las pantallas.
-   Los colores actuales son TEMPORALES hasta definir los corporativos (R43).
-   ========================================================================== */
 
 :root {
   /* --- Marca ------------------------------------------------------------ */

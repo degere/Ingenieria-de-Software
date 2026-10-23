@@ -3,7 +3,7 @@
 {% block panel_contenido %}
 <div class="panel-encabezado">
   <h1>{{ datos.titulo }}</h1>
-  {% if datos.nuevo %}<a class="btn btn-primario" href="#">+ {{ datos.nuevo }}</a>{% endif %}
+  {% if datos.nuevo %}<a class="btn btn-primario" href="{% url 'panel_nuevo' seccion_activa %}">+ {{ datos.nuevo }}</a>{% endif %}
 </div>
 
 <form class="barra-herramientas" method="get">
@@ -26,7 +26,15 @@
         {% for celda in fila %}
           <td>{% if celda.badge %}<span class="badge badge-{{ celda.badge }}">{{ celda.texto }}</span>{% else %}{{ celda }}{% endif %}</td>
         {% endfor %}
-        <td><a class="btn btn-borde btn-chico" href="#">Editar</a></td>
+        <td>
+          {% if tiene_formulario %}
+            <a class="btn btn-borde btn-chico" href="{% url 'panel_editar' seccion_activa forloop.counter %}">{% if seccion_activa == "caja" %}Cerrar caja{% else %}Editar{% endif %}</a>
+          {% elif seccion_activa == "ventas" %}
+            <a class="btn btn-borde btn-chico" href="{% url 'panel_venta_detalle' forloop.counter %}">Ver detalle</a>
+          {% elif seccion_activa == "reportes" %}
+            <a class="btn btn-borde btn-chico" href="#">Generar</a>
+          {% endif %}
+        </td>
       </tr>
       {% empty %}<tr><td colspan="{{ datos.columnas|length|add:1 }}" class="vacio">Sin registros.</td></tr>{% endfor %}
     </tbody>

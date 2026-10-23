@@ -1,0 +1,73 @@
+{% extends "cine_nido/panel/base_panel.html" %}
+{% block titulo %}Panel · {% if editando %}Editar{% else %}Nueva{% endif %} función{% endblock %}
+{% block panel_contenido %}
+<div class="panel-encabezado">
+  <h1>{% if editando %}Editar función{% else %}Nueva función{% endif %}</h1>
+  <a class="btn btn-borde" href="{% url 'panel_listado' 'funciones' %}">← Volver a funciones</a>
+</div>
+
+<form class="formulario-panel" method="post">
+  {% csrf_token %}
+  <section class="tarjeta">
+    <h2 class="subtitulo-form">Programación</h2>
+    <div class="campo"><label for="pelicula">Película</label>
+      <select id="pelicula" name="pelicula" required>
+        {% for p in peliculas %}<option value="{{ p.id }}" {% if obj.pelicula_id == p.id %}selected{% endif %}>{{ p.nombre }} ({{ p.duracion }} min · {{ p.formato }} · {{ p.idioma }})</option>{% endfor %}
+      </select>
+    </div>
+    <div class="campos-3">
+      <div class="campo"><label for="sala">Sala</label>
+        <select id="sala" name="sala">
+          {% for s in salas %}<option {% if obj.sala == s.nombre %}selected{% endif %}>{{ s.nombre }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="campo"><label for="fecha">Fecha</label><input id="fecha" type="date" name="fecha" value="{{ obj.fecha|date:'Y-m-d' }}" required></div>
+      <div class="campo"><label for="hora">Hora de inicio</label><input id="hora" type="time" name="hora" value="{{ obj.hora|default:'' }}" required></div>
+    </div>
+    <div class="resultado aviso">
+      <strong>Validación de horario</strong><br>
+      <span class="suave">El sistema no permitirá guardar si la función se cruza con otra en la misma sala, considerando la duración de la película y el tiempo de limpieza.</span>
+    </div>
+
+    <h2 class="subtitulo-form">Precios por tipo de entrada</h2>
+    <div class="campos-3">
+      <div class="campo"><label for="precio_general">General</label><input id="precio_general" type="number" name="precio_general" min="0" step="100" value="{{ precios.general }}"></div>
+      <div class="campo"><label for="precio_estudiante">Estudiante</label><input id="precio_estudiante" type="number" name="precio_estudiante" min="0" step="100" value="{{ precios.estudiante }}"></div>
+      <div class="campo"><label for="precio_adulto_mayor">Adulto mayor</label><input id="precio_adulto_mayor" type="number" name="precio_adulto_mayor" min="0" step="100" value="{{ precios.adulto_mayor }}"></div>
+    </div>
+
+    {% if editando and vendidas %}
+    <div class="resultado aviso">
+      <strong>Esta función ya tiene {{ vendidas }} entradas vendidas</strong><br>
+      <span class="suave">Si cambias la fecha, la hora o la sala, se notificará a los compradores por correo.</span>
+    </div>
+    {% endif %}
+
+    <div class="acciones-form">
+      <a class="btn btn-borde" href="{% url 'panel_listado' 'funciones' %}">Cancelar</a>
+      <button class="btn btn-primario" type="submit">{% if editando %}Guardar cambios{% else %}Programar función{% endif %}</button>
+    </div>
+  </section>
+
+  <aside class="lateral-form">
+    <div class="tarjeta">
+      <h3>Horarios habituales</h3>
+      <p class="ayuda">Bloques que usa el cine normalmente.</p>
+      <div class="chips">
+        <span class="chip-horario"><strong>15:30</strong><small>Tarde</small></span>
+        <span class="chip-horario"><strong>18:00</strong><small>Tarde</small></span>
+        <span class="chip-horario"><strong>20:30</strong><small>Noche</small></span>
+      </div>
+    </div>
+
+    {% if editando %}
+    <div class="tarjeta zona-baja">
+      <h3>Cancelar función</h3>
+      <p class="ayuda">Se liberan los asientos y se avisa a los clientes para gestionar la devolución.</p>
+      <div class="campo"><label for="motivo">Motivo</label><textarea id="motivo" name="motivo" rows="2" placeholder="Ej: falla en el proyector"></textarea></div>
+      <button class="btn btn-secundario btn-bloque" type="submit" name="accion" value="baja" formnovalidate data-confirmar="¿Seguro que quieres cancelar esta función?">Cancelar función</button>
+    </div>
+    {% endif %}
+  </aside>
+</form>
+{% endblock %}
