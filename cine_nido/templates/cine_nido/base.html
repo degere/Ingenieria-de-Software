@@ -24,6 +24,10 @@
           {% if user.is_authenticated %}
             {% if user.is_staff %}<a href="{% url 'panel_dashboard' %}" class="btn btn-borde btn-chico">Panel</a>{% endif %}
             <span class="suave">Hola, {{ user.first_name|default:user.username }}</span>
+            <form method="post" action="{% url 'salir' %}">
+              {% csrf_token %}
+              <button class="btn btn-borde btn-chico" type="submit">Cerrar sesión</button>
+            </form>
           {% else %}
             <a href="{% url 'ingresar' %}" class="btn btn-borde btn-chico">Ingresar</a>
             <a href="{% url 'registro' %}" class="btn btn-primario btn-chico">Registrarse</a>

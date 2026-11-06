@@ -7,7 +7,8 @@
     <p class="suave">Accede con tu correo y contraseña.</p>
     <form method="post">
       {% csrf_token %}
-      <div class="campo"><label for="correo">Correo</label><input id="correo" type="email" name="correo" required autocomplete="email"></div>
+      <input type="hidden" name="next" value="{{ next }}">
+      <div class="campo"><label for="correo">Correo</label><input id="correo" type="email" name="correo" value="{{ correo }}" required autocomplete="email"></div>
       <div class="campo"><label for="clave">Contraseña</label><input id="clave" type="password" name="clave" required autocomplete="current-password"></div>
       <p><a href="{% url 'recuperar' %}">¿Olvidaste tu contraseña?</a></p>
       <button class="btn btn-primario btn-bloque" type="submit">Ingresar</button>

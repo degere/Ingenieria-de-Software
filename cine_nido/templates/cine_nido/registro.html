@@ -8,11 +8,7 @@
     <form method="post">
       {% csrf_token %}
       <div class="campo"><label for="nombre">Nombre completo</label><input id="nombre" name="nombre" required autocomplete="name"></div>
-      <div class="campos-2">
-        <div class="campo"><label for="rut">RUT</label><input id="rut" name="rut" placeholder="12.345.678-9" required></div>
-        <div class="campo"><label for="telefono">Teléfono</label><input id="telefono" type="tel" name="telefono" placeholder="+56 9 1234 5678" autocomplete="tel"></div>
-      </div>
-      <div class="campo"><label for="correo">Correo</label><input id="correo" type="email" name="correo" required autocomplete="email"></div>
+      <div class="campo"><label for="correo">Correo</label><input id="correo" type="email" name="correo" value="{{ correo }}" maxlength="150" required autocomplete="email"></div>
       <div class="campos-2">
         <div class="campo"><label for="clave">Contraseña</label><input id="clave" type="password" name="clave" required autocomplete="new-password"></div>
         <div class="campo"><label for="clave2">Repetir contraseña</label><input id="clave2" type="password" name="clave2" required autocomplete="new-password"></div>

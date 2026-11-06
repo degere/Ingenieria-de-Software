@@ -16,6 +16,7 @@ urlpatterns = [
     # Cuenta
     path("cuenta/ingresar/", views.ingresar, name="ingresar"),
     path("cuenta/registro/", views.registro, name="registro"),
+    path("cuenta/salir/", views.salir, name="salir"),
     path("cuenta/recuperar/", views.recuperar, name="recuperar"),
     path("cuenta/mis-compras/", views.mis_compras, name="mis_compras"),
 

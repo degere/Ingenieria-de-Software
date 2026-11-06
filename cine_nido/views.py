@@ -1,7 +1,12 @@
 
+from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.contrib.auth.password_validation import validate_password
 from django.contrib import messages
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.http import Http404
 from django.shortcuts import redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from . import datos_demo as demo
 
@@ -69,11 +74,103 @@ def entrada(request, compra_id):
 # ---------------------------- Cuenta ----------------------------
 
 def ingresar(request):
-    return render(request, "cine_nido/ingresar.html")
+    if request.user.is_authenticated:
+        return redirect("cartelera")
+
+    next_url = request.POST.get("next") or request.GET.get("next", "")
+    if request.method == "POST":
+        correo = request.POST.get("correo", "").strip()
+        clave = request.POST.get("clave", "")
+        usuario_modelo = get_user_model()
+        usuario = usuario_modelo.objects.filter(email__iexact=correo).first() if correo else None
+        if usuario is None:
+            usuario = authenticate(request, username=correo, password=clave)
+        else:
+            usuario = authenticate(request, username=usuario.get_username(), password=clave)
+
+        if usuario is not None:
+            login(request, usuario)
+            if url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+                return redirect(next_url)
+            return redirect("cartelera")
+
+        messages.error(request, "El correo o la contraseña no son correctos.")
+
+    return render(request, "cine_nido/ingresar.html", {
+        "correo": request.POST.get("correo", ""),
+        "next": next_url,
+    })
 
 
 def registro(request):
-    return render(request, "cine_nido/registro.html")
+    if request.user.is_authenticated:
+        return redirect("cartelera")
+
+    datos = {
+        "nombre": request.POST.get("nombre", "").strip(),
+        "correo": request.POST.get("correo", "").strip(),
+    }
+    if request.method == "POST":
+        correo = datos["correo"]
+        nombre = datos["nombre"]
+        clave = request.POST.get("clave", "")
+        clave2 = request.POST.get("clave2", "")
+        usuario_modelo = get_user_model()
+        errores = []
+
+        try:
+            validate_email(correo)
+        except ValidationError:
+            errores.append("Ingresa un correo válido.")
+
+        if not nombre:
+            errores.append("Ingresa tu nombre.")
+        if usuario_modelo.objects.filter(email__iexact=correo).exists():
+            errores.append("Ya existe una cuenta con ese correo.")
+        if clave != clave2:
+            errores.append("Las contraseñas no coinciden.")
+
+        partes_nombre = nombre.split(maxsplit=1)
+        usuario = usuario_modelo(
+            username=correo,
+            email=correo,
+            first_name=partes_nombre[0][:150],
+            last_name=partes_nombre[1][:150] if len(partes_nombre) > 1 else "",
+        )
+        try:
+            validate_password(clave, user=usuario)
+        except ValidationError as error:
+            errores.extend(error.messages)
+
+        if len(correo) > 150:
+            errores.append("El correo no puede superar los 150 caracteres.")
+        if usuario_modelo.objects.filter(username__iexact=correo).exists():
+            errores.append("No se puede usar ese correo para crear el nombre de usuario.")
+
+        if errores:
+            for error in errores:
+                messages.error(request, error)
+        else:
+            usuario = usuario_modelo.objects.create_user(
+                username=correo,
+                email=correo,
+                password=clave,
+                first_name=partes_nombre[0][:150],
+                last_name=partes_nombre[1][:150] if len(partes_nombre) > 1 else "",
+            )
+            login(request, usuario)
+            messages.success(request, "Tu cuenta fue creada correctamente.")
+            return redirect("cartelera")
+
+    return render(request, "cine_nido/registro.html", datos)
+
+
+def salir(request):
+    if request.method != "POST":
+        return redirect("cartelera")
+    logout(request)
+    messages.success(request, "Has cerrado sesión.")
+    return redirect("cartelera")
 
 
 def recuperar(request):
