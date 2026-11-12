@@ -23,14 +23,14 @@
     <tbody>
       {% for fila in datos.filas %}
       <tr>
-        {% for celda in fila %}
+        {% for celda in fila.celdas|default:fila %}
           <td>{% if celda.badge %}<span class="badge badge-{{ celda.badge }}">{{ celda.texto }}</span>{% else %}{{ celda }}{% endif %}</td>
         {% endfor %}
         <td>
           {% if tiene_formulario %}
-            <a class="btn btn-borde btn-chico" href="{% url 'panel_editar' seccion_activa forloop.counter %}">{% if seccion_activa == "caja" %}Cerrar caja{% else %}Editar{% endif %}</a>
+            <a class="btn btn-borde btn-chico" href="{% url 'panel_editar' seccion_activa fila.pk|default:forloop.counter %}">{% if seccion_activa == "caja" %}Cerrar caja{% else %}Editar{% endif %}</a>
           {% elif seccion_activa == "ventas" %}
-            <a class="btn btn-borde btn-chico" href="{% url 'panel_venta_detalle' forloop.counter %}">Ver detalle</a>
+            <a class="btn btn-borde btn-chico" href="{% url 'panel_venta_detalle' fila.pk|default:forloop.counter %}">Ver detalle</a>
           {% elif seccion_activa == "reportes" %}
             <a class="btn btn-borde btn-chico" href="#">Generar</a>
           {% endif %}

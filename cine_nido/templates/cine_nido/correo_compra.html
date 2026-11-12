@@ -1,0 +1,48 @@
+{% extends "cine_nido/base.html" %}
+{% block titulo %}Tu correo para las entradas{% endblock %}
+{% block contenido %}
+<div class="contenedor">
+  {% include "cine_nido/_pasos.html" with paso=2 %}
+
+  <form class="compra" method="post" action="{% url 'compra_correo' %}">
+    {% csrf_token %}
+    <section class="tarjeta">
+      <h1 style="font-size:1.4rem">¿A qué correo enviamos tus entradas?</h1>
+      <p class="suave">Tus asientos ya fueron reservados temporalmente. Ingresa tu correo electrónico para enviarte los boletos y el código QR una vez confirmado el pago.</p>
+
+      <div class="campo" style="margin-top:1rem">
+        <label for="correo">Correo electrónico</label>
+        <input id="correo" type="email" name="correo" value="{{ correo|default:'' }}" placeholder="tucorreo@ejemplo.cl" required autocomplete="email" autofocus>
+        <p class="ayuda">Asegúrate de escribirlo correctamente para recibir tu comprobante.</p>
+      </div>
+
+      <div class="acciones" style="margin-top:1.25rem; display:flex; gap:.75rem; flex-wrap:wrap">
+        <button type="submit" name="destino" value="confiteria" class="btn btn-primario">Continuar a confitería</button>
+        <button type="submit" name="destino" value="pago" class="btn btn-borde">Ir directo al pago</button>
+      </div>
+
+      <hr style="margin:1.5rem 0; border:0; border-top:1px solid var(--borde, #333)">
+      <p class="suave" style="margin:0">
+        ¿Ya tienes una cuenta en Cine Nido?
+        <a href="{% url 'ingresar' %}?next={% url 'compra_correo' %}"><strong>Inicia sesión aquí</strong></a>
+        y usaremos tu correo registrado automáticamente.
+      </p>
+    </section>
+
+    <aside class="tarjeta resumen">
+      <div class="temporizador" data-temporizador="{{ segundos_restantes|default:600 }}">Tu reserva vence en <strong>10:00</strong></div>
+      <h3>Asientos reservados</h3>
+      <dl>
+        <dt>Película</dt><dd>{{ resumen.pelicula }}</dd>
+        <dt>Función</dt><dd>{{ resumen.funcion }}</dd>
+        <dt>Asientos</dt><dd>{{ resumen.asientos }}</dd>
+        <dt>Subtotal entradas</dt><dd>${{ resumen.entradas|floatformat:"0g" }}</dd>
+      </dl>
+      <div class="linea-total"><span>Total actual</span><span class="valor">${{ resumen.total|floatformat:"0g" }}</span></div>
+      {% if funcion_id %}
+      <a class="btn btn-borde btn-bloque" style="margin-top:.5rem" href="{% url 'asientos' funcion_id %}">Cambiar asientos</a>
+      {% endif %}
+    </aside>
+  </form>
+</div>
+{% endblock %}
