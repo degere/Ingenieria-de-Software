@@ -18,7 +18,7 @@
     <div class="campos-3">
       <div class="campo"><label for="sala">Sala</label>
         <select id="sala" name="sala">
-          {% for s in salas %}<option {% if obj.sala == s.nombre %}selected{% endif %}>{{ s.nombre }}</option>{% endfor %}
+          {% for s in salas %}<option value="{{ s.id }}" {% if obj.sala_id == s.id or obj.sala == s.nombre %}selected{% endif %}>{{ s.nombre }}</option>{% endfor %}
         </select>
       </div>
       <div class="campo"><label for="fecha">Fecha</label><input id="fecha" type="date" name="fecha" value="{{ obj.fecha|date:'Y-m-d' }}" required></div>

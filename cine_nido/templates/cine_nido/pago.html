@@ -5,15 +5,26 @@
   {% include "cine_nido/_pasos.html" with paso=4 %}
 
   {# DEMO: el pago real se hará con una pasarela externa certificada (R31, R49). Aquí NO se piden datos de tarjeta. #}
-  <form class="compra" method="post" action="{% url 'entrada' 123 %}">
+  <form class="compra" method="post" action="{% url 'pago' %}">
     {% csrf_token %}
+    <input type="hidden" name="confirmar_pago" value="1">
     <section class="tarjeta">
       <h1 style="font-size:1.4rem">Confirma y paga</h1>
 
       <div class="campo">
         <label for="correo">Correo para enviar tus entradas</label>
-        <input id="correo" type="email" name="correo" placeholder="tucorreo@ejemplo.cl" required>
-        <p class="ayuda">Te enviaremos el comprobante y las entradas con código QR.</p>
+        {% if user.is_authenticated %}
+          <p style="margin:.35rem 0"><strong>{{ correo_compra }}</strong> <span class="badge badge-ok">Correo de tu cuenta</span></p>
+          <input type="hidden" name="correo" value="{{ correo_compra }}">
+          <p class="ayuda">Usaremos automáticamente el correo registrado en tu cuenta para enviarte el comprobante y las entradas con código QR.</p>
+        {% elif correo_compra %}
+          <p style="margin:.35rem 0"><strong>{{ correo_compra }}</strong> · <a href="{% url 'compra_correo' %}">Cambiar correo</a></p>
+          <input type="hidden" name="correo" value="{{ correo_compra }}">
+          <p class="ayuda">Te enviaremos el comprobante y las entradas con código QR a este correo.</p>
+        {% else %}
+          <input id="correo" type="email" name="correo" value="" placeholder="tucorreo@ejemplo.cl" required>
+          <p class="ayuda">Te enviaremos el comprobante y las entradas con código QR.</p>
+        {% endif %}
       </div>
 
       <h3>Medio de pago</h3>
@@ -25,7 +36,7 @@
     </section>
 
     <aside class="tarjeta resumen">
-      <div class="temporizador" data-temporizador="480">Tu reserva vence en <strong>08:00</strong></div>
+      <div class="temporizador" data-temporizador="{{ segundos_restantes|default:480 }}">Tu reserva vence en <strong>08:00</strong></div>
       <h3>Detalle de la compra</h3>
       <dl>
         <dt>Película</dt><dd>{{ resumen.pelicula }}</dd>
